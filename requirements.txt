@@ -1,0 +1,5 @@
+accelerate
+huggingface_hub
+safetensors
+torch
+transformers>=4.51.0

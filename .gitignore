@@ -1,0 +1,43 @@
+# Python cache and build outputs
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.env/
+
+# Local model weights and Hugging Face cache
+models/
+.cache/
+*.safetensors
+*.bin
+*.gguf
+*.onnx
+
+# Runtime files
+.phase01_web.pid
+.phase*.pid
+*.log
+logs/
+
+# Benchmark/profile artifacts that can be regenerated
+*.nsys-rep
+*.sqlite
+nsight_trace/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local secrets
+.env
+*.env
