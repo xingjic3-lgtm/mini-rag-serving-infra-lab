@@ -7,6 +7,9 @@ def main():
     print("[Document Loaded]")
     print(result.document)
 
+    print("\n[Mode]")
+    print(result.mode)
+
     print("\n[Question]")
     print(result.question)
 

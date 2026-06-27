@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from urllib.parse import urlparse
 
-from rag_pipeline import DEFAULT_DOCUMENT, DEFAULT_QUESTION, run_rag
+from rag_pipeline import DEFAULT_DOCUMENT, DEFAULT_QUESTION, run_chat, run_rag
 
 
 HOST = "127.0.0.1"
@@ -149,7 +149,7 @@ HTML = """<!doctype html>
   <main>
     <section>
       <h2>Request</h2>
-      <label for="document">Document</label>
+      <label for="document">Document (optional; empty means direct chat)</label>
       <textarea id="document"></textarea>
       <label for="question">Question</label>
       <input id="question" type="text">
@@ -157,6 +157,10 @@ HTML = """<!doctype html>
       <div class="status" id="status"></div>
     </section>
     <section class="output">
+      <div>
+        <h2>Mode</h2>
+        <pre id="mode"></pre>
+      </div>
       <div>
         <h2>Retrieved Context</h2>
         <pre id="context"></pre>
@@ -177,6 +181,7 @@ HTML = """<!doctype html>
     const questionInput = document.getElementById("question");
     const button = document.getElementById("ask");
     const statusBox = document.getElementById("status");
+    const modeBox = document.getElementById("mode");
     const contextBox = document.getElementById("context");
     const promptBox = document.getElementById("prompt");
     const answerBox = document.getElementById("answer");
@@ -187,6 +192,7 @@ HTML = """<!doctype html>
     async function ask() {
       button.disabled = true;
       statusBox.textContent = "Running local model. First request may take a few seconds.";
+      modeBox.textContent = "";
       contextBox.textContent = "";
       promptBox.textContent = "";
       answerBox.textContent = "";
@@ -206,7 +212,8 @@ HTML = """<!doctype html>
           throw new Error(data.error || "Request failed");
         }
 
-        contextBox.textContent = data.retrieved_context;
+        modeBox.textContent = data.mode;
+        contextBox.textContent = data.retrieved_context || "(direct chat mode: no document retrieval)";
         promptBox.textContent = data.prompt;
         answerBox.textContent = data.answer;
         statusBox.textContent = "Done";
@@ -245,13 +252,14 @@ class RagRequestHandler(BaseHTTPRequestHandler):
             document = str(payload.get("document", "")).strip()
             question = str(payload.get("question", "")).strip()
 
-            if not document or not question:
-                self._send_json({"error": "Document and question are required."}, status=400)
+            if not question:
+                self._send_json({"error": "Question is required."}, status=400)
                 return
 
-            result = run_rag(document, question)
+            result = run_rag(document, question) if document else run_chat(question)
             self._send_json(
                 {
+                    "mode": result.mode,
                     "document": result.document,
                     "question": result.question,
                     "retrieved_context": result.retrieved_context,

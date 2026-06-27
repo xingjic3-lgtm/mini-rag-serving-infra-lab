@@ -40,6 +40,7 @@ class RagResult:
     retrieved_context: str
     prompt: str
     answer: str
+    mode: str
 
 
 class LocalGenerator:
@@ -133,6 +134,17 @@ Answer:
 """
 
 
+def build_chat_prompt(question: str) -> str:
+    return f"""You are a helpful assistant.
+Answer the user's question directly and concisely.
+
+Question:
+{question}
+
+Answer:
+"""
+
+
 def generate_answer(
     prompt: str,
     model_path: Path = DEFAULT_MODEL_PATH,
@@ -152,6 +164,21 @@ def run_rag(document: str, question: str, model_path: Path = DEFAULT_MODEL_PATH)
         retrieved_context=retrieved_context,
         prompt=prompt,
         answer=answer,
+        mode="rag",
+    )
+
+
+def run_chat(question: str, model_path: Path = DEFAULT_MODEL_PATH) -> RagResult:
+    prompt = build_chat_prompt(question)
+    answer = generate_answer(prompt, model_path=model_path)
+
+    return RagResult(
+        document="",
+        question=question,
+        retrieved_context="",
+        prompt=prompt,
+        answer=answer,
+        mode="chat",
     )
 
 

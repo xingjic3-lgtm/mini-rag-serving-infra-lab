@@ -1,9 +1,10 @@
 # Phase 01: Business App
 
-This phase builds the smallest local document QA business loop:
+This phase builds the smallest local document QA business loop, plus a direct chat fallback:
 
 ```text
 fixed document -> fixed question -> retrieve context -> build prompt -> local LLM answer
+empty document -> question -> build chat prompt -> local LLM answer
 ```
 
 ## Model
